@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Livres - Bibliothèque</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-100 min-h-screen p-6">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        
+        <!-- En-tête -->
+        <div class="bg-slate-800 text-white px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold">📚 Gestion de Bibliothèque</h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-slate-300">Connecté : <strong>{{ user.username }}</strong></span>
+                <form action="{% url 'deconnexion' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded transition">
+                        Se déconnecter
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <!-- Barre d'actions -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="space-x-2">
+                    <a href="{% url 'ajouter_livre' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow">
+                        + Ajouter un livre
+                    </a>
+                    <a href="{% url 'liste_emprunts' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow">
+                        📋 Voir les emprunts
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tableau des livres -->
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 text-slate-700 uppercase text-xs tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th class="px-6 py-3">Titre</th>
+                            <th class="px-6 py-3">Auteur</th>
+                            <th class="px-6 py-3">Catégorie</th>
+                            <th class="px-6 py-3">Quantité</th>
+                            <th class="px-6 py-3 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-slate-600 text-sm">
+                        {% for livre in livres %}
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4 font-medium text-slate-800">{{ livre.titre }}</td>
+                            <td class="px-6 py-4">{{ livre.auteur }}</td>
+                            <td class="px-6 py-4">
+                                <span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full text-xs font-semibold">
+                                    {{ livre.categorie }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if livre.quantite > 0 %}
+                                    <span class="text-green-600 font-semibold">{{ livre.quantite }} disponible(s)</span>
+                                {% else %}
+                                    <span class="text-red-500 font-semibold">Rupture</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-center space-x-2">
+                                {% if livre.quantite > 0 %}
+                                    <a href="{% url 'emprunter_livre' livre.id %}" class="text-blue-600 hover:underline font-medium">Emprunter</a>
+                                {% endif %}
+                                <a href="{% url 'modifier_livre' livre.id %}" class="text-amber-600 hover:underline font-medium">Modifier</a>
+                                <a href="{% url 'supprimer_livre' livre.id %}" class="text-red-600 hover:underline font-medium">Supprimer</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-8 text-center text-slate-400">Aucun livre enregistré pour le moment.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
